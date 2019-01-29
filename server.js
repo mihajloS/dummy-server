@@ -1,7 +1,30 @@
+const emailService = require('./email_service.js')
+// import validator from 'validator';
+const express = require('express')
+const app = express()
 const PORT = process.env.PORT || 8000
 
-const http = require('http');
-http.createServer(function (req, res) {
-	res.writeHead(200, {'Content-Type': 'text/plain'});
-	res.end('Mihajlos test page');
-}).listen(PORT);
+app.use(express.json()); // for parsing application/json
+
+app.get('/', (req, res) => {
+	console.log('/')
+	res.send('Index page')
+
+})
+
+app.post('/contact_mihajlo', (req, res) => {
+
+	// api is not checking for required filed
+	// api has no tests
+
+	console.log('contact mihajlo')
+	console.log('req.body', req.body)
+	const message = req.body.message
+	const from = req.body.from
+	const email_promise = emailService.sendEmail(from, message).then((response) => {
+		res.send(`Email: ${!!response}`)
+	})
+
+})
+
+app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })

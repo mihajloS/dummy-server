@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/mihajloS/dummy-server/issues"
   },
-  "homepage": "https://github.com/mihajloS/dummy-server#readme"
+  "homepage": "https://github.com/mihajloS/dummy-server#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "nodemailer": "^5.1.1"
+  }
 }
