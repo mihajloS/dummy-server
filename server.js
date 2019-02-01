@@ -1,30 +1,21 @@
-const emailService = require('./email_service.js')
-// import validator from 'validator';
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 const PORT = process.env.PORT || 8000
+const contact = require('./contact/contact')
+const mongoose = require('mongoose')
+const config = require('config')
 
-app.use(express.json()); // for parsing application/json
+mongoose.connect(config.db.dbUri, { useNewUrlParser: true })
+const db = mongoose.connection
+db.on('error', console.error.bind(console, 'Db error:'))
+db.on('open', console.log.bind(console, 'Db connection success'))
 
-app.get('/', (req, res) => {
-	console.log('/')
-	res.send('Index page')
+app.use(express.json()) // for parsing application/json
+app.use(morgan('dev')) // for loging requests
 
-})
+app.get('/', (req, res) => { res.send('Index page') })
 
-app.post('/contact_mihajlo', (req, res) => {
-
-	// api is not checking for required filed
-	// api has no tests
-
-	console.log('contact mihajlo')
-	console.log('req.body', req.body)
-	const message = req.body.message
-	const from = req.body.from
-	const email_promise = emailService.sendEmail(from, message).then((response) => {
-		res.send(`Email: ${!!response}`)
-	})
-
-})
+app.route('/contact_mihajlo').post(contact.emailToMihajlo)
 
 app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
