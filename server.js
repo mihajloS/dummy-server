@@ -15,14 +15,7 @@ db.on('open', ()=>{
 })
 
 const allowCrossDomain = function(req, res, next) {
-    const allowedOrigins = ['http://www.mihajlosupic.com', "http://www.mihajlosupic.com"]
-    for(var i=0;i<allowedOrigins.length;i++){
-      var origin = allowedOrigins[i];
-      if(req.headers.origin.indexOf(origin) > -1){
-           res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-           return;
-      }
-  }
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 
