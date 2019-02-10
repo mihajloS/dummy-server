@@ -34,10 +34,8 @@ async function emailToMihajlo(req, res) {
 async function storeEmailToDB(from, message) {
   const newEmail = new Email({from, message});
   const saved = await newEmail.save().catch((err) => {
-    console.log('Mongoose error', err);
     return false;
   });
-  console.log('>> saved', saved);
   return saved;
 }
 
