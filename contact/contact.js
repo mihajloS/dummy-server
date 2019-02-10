@@ -7,26 +7,38 @@ const config = require('config').email;
  * @param {Object} req
  * @param {Object} res
  */
-function emailToMihajlo(req, res) {
-  console.log('email to mihajlo', req.body);
+async function emailToMihajlo(req, res) {
   const message = req.body.message;
   const from = req.body.from;
-  const promise = main(from, message)
-      .catch((e) => console.log('main email error', e));
+  const isSent = await sendEmail(from, message);
+  const isStoredEmail = await storeEmailToDB(from, message);
 
-  promise.then((success) => {
-    if (!success) return res(success);
-    const newEmail = new Email({from, message});
-    newEmail.save((err, email )=> {
-      if (err) {
-        console.error('Email error', err);
-        res.send(err);
-      } else {
-        console.log('email sent', email);
-        res.json(email);
-      }
-    });
+  const logMsg = isSent ? 'is sent with success.' :
+      'is not sent because of an error!';
+  console.log(`Email ${logMsg}`);
+
+  if (isStoredEmail) {
+    res.json(isStoredEmail);
+    console.log(`Email ${JSON.stringify(isStoredEmail)} stored with success`);
+  } else {
+    res.send('Email not stored to db');
+    console.log('Email not stored in db')
+  }
+}
+
+/**
+ * Store email to database
+ * @param {String} from
+ * @param {String} message
+ */
+async function storeEmailToDB(from, message) {
+  const newEmail = new Email({from, message});
+  const saved = await newEmail.save().catch((err) => {
+    console.log('Mongoose error', err);
+    return false;
   });
+  console.log('>> saved', saved);
+  return saved;
 }
 
 /**
@@ -34,7 +46,7 @@ function emailToMihajlo(req, res) {
  * @param {String} fromEmail
  * @param {String} message
  */
-async function main(fromEmail, message) {
+async function sendEmail(fromEmail, message) {
   const transport = nodemailer.createTransport({
     host: config.sender.host,
     port: config.sender.port,
