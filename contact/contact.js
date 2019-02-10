@@ -1,3 +1,4 @@
+const log = require('../logger').logger;
 const nodemailer = require('nodemailer');
 const Email = require('../dbmodels/contact/email');
 const config = require('config').email;
@@ -15,14 +16,14 @@ async function emailToMihajlo(req, res) {
 
   const logMsg = isSent ? 'is sent with success.' :
       'is not sent because of an error!';
-  console.log(`Email ${logMsg}`);
+  log.info(`Email ${logMsg}`);
 
   if (isStoredEmail) {
     res.json(isStoredEmail);
-    console.log(`Email ${JSON.stringify(isStoredEmail)} stored with success`);
+    log.info(`Email ${JSON.stringify(isStoredEmail)} stored with success`);
   } else {
     res.send('Email not stored to db');
-    console.log('Email not stored in db')
+    log.info('Email not stored in db')
   }
 }
 
@@ -59,7 +60,7 @@ async function sendEmail(fromEmail, message) {
   const transpromise = transport.verify();
   const verifyResult = await transpromise;
   if (!verifyResult) {
-    console.log('Error in SMTP connection');
+    log.error('Error in SMTP connection');
     return false;
   }
 
@@ -75,8 +76,8 @@ async function sendEmail(fromEmail, message) {
   // send mail with defined transport object
   const info = await transport.sendMail(mailOptions);
 
-  console.log('Message sent: %s', JSON.stringify(info));
-  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+  log.info(`Message sent: ${JSON.stringify(info)}`);
+  log.info(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
   return true;
 }
 

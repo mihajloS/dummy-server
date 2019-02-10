@@ -23,7 +23,8 @@
     "express": "^4.16.4",
     "mongoose": "^5.4.8",
     "morgan": "^1.9.1",
-    "nodemailer": "^5.1.1"
+    "nodemailer": "^5.1.1",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "chai-http": "^2.0.1",

@@ -1,3 +1,4 @@
+const log = require('./logger').logger;
 const express = require('express');
 const morgan = require('morgan');
 const app = express();
@@ -8,9 +9,9 @@ const config = require('config').db;
 
 mongoose.connect(config.dbUri, {useNewUrlParser: true});
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'Db error:'));
+db.on('error', log.error.bind(log, 'Db error:'));
 db.on('open', ()=>{
-  console.log(`Db connection success [${config.description}]`);
+  log.info(`Db connection success [${config.description}]`);
   app.emit('appStarted');
 });
 
@@ -40,7 +41,7 @@ app.get('/', (req, res) => {
 app.route('/contact_mihajlo').post(contact.emailToMihajlo);
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+  log.info(`App listening on port ${PORT}`);
 });
 
 module.exports = app; // for testing
