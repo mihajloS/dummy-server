@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 describe('Email', () =>{
   describe('SEND email', () => {
     it('it should use \"contact_mihajlo\" api correctly', (done)=>{
-      const newEmail = {from: 'mail@mail.com', message: 'Hey you'};
+      const newEmail = {from: 'unit@test.com', message: 'Hey you. I am your unit test!'};
       chai.request(server)
           .post('/contact_mihajlo')
           .send(newEmail)
