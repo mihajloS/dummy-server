@@ -7,4 +7,10 @@ const logger = winston.createLogger({
   ],
 });
 
+// Disable logs for unit testing
+if (process.env.NODE_ENV === 'test') {
+  logger.clear()
+  logger.add(new winston.transports.Console({silent: true}));
+}
+
 module.exports = {logger};
