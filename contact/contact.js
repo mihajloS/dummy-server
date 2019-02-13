@@ -23,7 +23,7 @@ async function emailToMihajlo(req, res) {
     log.info(`Email ${JSON.stringify(isStoredEmail)} stored with success`);
   } else {
     res.send('Email not stored to db');
-    log.info('Email not stored in db')
+    log.info('Email not stored in db');
   }
 }
 
