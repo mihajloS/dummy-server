@@ -5,8 +5,11 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const contact = require('./contact/contact');
 const mongoose = require('mongoose');
+const server = require('http').createServer();
+const WebSocketServer = require('websocket').server;
 const config = require('config').db;
 
+// Database init
 mongoose.connect(config.dbUri, {useNewUrlParser: true});
 const db = mongoose.connection;
 db.on('error', log.error.bind(log, 'Db error:'));
@@ -30,17 +33,65 @@ const allowCrossDomain = function(req, res, next) {
 };
 
 app.use(allowCrossDomain);
-
 app.use(express.json()); // for parsing application/json
 app.use(morgan('dev')); // for loging requests
 
+// Quick test page
 app.get('/', (req, res) => {
   res.send('Index page');
 });
 
+// email api
 app.route('/contact_mihajlo').post(contact.emailToMihajlo);
 
-app.listen(PORT, () => {
+const wsServer = new WebSocketServer({
+  httpServer: server,
+  autoAcceptConnections: false,
+});
+
+/**
+ * Validate origin
+ * @param {Object} origin
+ * @return {Boolean} true if valid
+ */
+function originIsAllowed(origin) {
+  // put logic here to detect whether the specified origin is allowed.
+  return true;
+}
+
+server.on('request', app);
+
+wsServer.on('request', function(request) {
+  if (!originIsAllowed(request.origin)) {
+    // Make sure we only accept requests from an allowed origin
+    request.reject();
+    logger.error((new Date()) + ' Connection from origin ' +
+      request.origin + ' rejected.');
+    return;
+  }
+
+  const connection = request.accept('m-protocol', request.origin);
+  log.info((new Date()) + ' Connection accepted.');
+
+  connection.on('message', function(message) {
+    log.info('>> >> msg ' + message);
+    if (message.type === 'utf8') {
+      log.info('Received Message: ' + message.utf8Data);
+      connection.sendUTF(message.utf8Data);
+    } else if (message.type === 'binary') {
+      log.info('Received Binary Message of ' +
+        message.binaryData.length + ' bytes');
+      connection.sendBytes(message.binaryData);
+    }
+  });
+
+  connection.on('close', function(reasonCode, description) {
+    log.info((new Date()) + ' Peer ' +
+      connection.remoteAddress + ' disconnected.');
+  });
+});
+
+server.listen(PORT, () => {
   log.info(`App listening on port ${PORT}`);
 });
 
