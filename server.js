@@ -3,17 +3,18 @@ const express = require('express');
 const morgan = require('morgan');
 const app = express();
 const PORT = process.env.PORT || 8000;
-const contact = require('./contact/contact');
+const contact = require('./routes/contact/contact');
 const mongoose = require('mongoose');
 const server = require('http').createServer();
 const WebSocketServer = require('websocket').server;
 const config = require('config').db;
+const dataRouter = require('./ws-router');
 
 // Database init
 mongoose.connect(config.dbUri, {useNewUrlParser: true});
 const db = mongoose.connection;
 db.on('error', log.error.bind(log, 'Db error:'));
-db.on('open', ()=>{
+db.on('open', () => {
   log.info(`Db connection success [${config.description}]`);
   app.emit('appStarted');
 });
@@ -70,14 +71,14 @@ wsServer.on('request', function(request) {
     return;
   }
 
+  // craches on wrong protocol FIXME
   const connection = request.accept('m-protocol', request.origin);
   log.info((new Date()) + ' Connection accepted.');
 
   connection.on('message', function(message) {
     log.info('>> >> msg ' + message);
     if (message.type === 'utf8') {
-      log.info('Received Message: ' + message.utf8Data);
-      connection.sendUTF(message.utf8Data);
+      dataRouter.route(connection, message.utf8Data);
     } else if (message.type === 'binary') {
       log.info('Received Binary Message of ' +
         message.binaryData.length + ' bytes');

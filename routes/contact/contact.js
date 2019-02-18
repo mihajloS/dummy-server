@@ -1,6 +1,6 @@
-const log = require('../logger').logger;
+const log = require('../../logger').logger;
 const nodemailer = require('nodemailer');
-const Email = require('../dbmodels/contact/email');
+const Email = require('../../dbmodels/contact/email');
 const config = require('config').email;
 
 /**
