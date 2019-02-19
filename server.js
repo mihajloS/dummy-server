@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const app = express();
 const PORT = process.env.PORT || 8000;
 const contact = require('./routes/contact/contact');
+const authenticate = require('./routes/authenticate/login');
 const mongoose = require('mongoose');
 const server = require('http').createServer();
 const WebSocketServer = require('websocket').server;
@@ -43,7 +44,10 @@ app.get('/', (req, res) => {
 });
 
 // email api
-app.route('/contact_mihajlo').post(contact.emailToMihajlo);
+app.route('/contact_mihajlo')
+    .post(contact.emailToMihajlo);
+
+app.use('/auth', authenticate);
 
 const wsServer = new WebSocketServer({
   httpServer: server,
