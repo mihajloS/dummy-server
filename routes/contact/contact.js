@@ -4,7 +4,7 @@ const Email = require('../../dbmodels/contact/email');
 const config = require('config').email;
 
 /**
- * Send and store email
+ * API Send and store email
  * @param {Object} req
  * @param {Object} res
  */
