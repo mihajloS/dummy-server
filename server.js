@@ -33,7 +33,6 @@ const allowCrossDomain = function(req, res, next) {
     next();
   }
 };
-
 app.use(allowCrossDomain);
 app.use(express.json()); // for parsing application/json
 app.use(morgan('dev')); // for loging requests
