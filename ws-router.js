@@ -16,13 +16,13 @@ const rpcRequestSchema = {
   required: ['jsonrpc', 'method', 'params', 'id'],
 };
 
-// validate.addSchema(rpcRequestSchema, '/rpc');
 /**
  * Route websocket message
+ * @param {Object} wsServer Server instance
  * @param {Object} conn Websocket connection
  * @param {Object} rawClientData data
  */
-function route(conn, rawClientData) {
+function route(wsServer, conn, rawClientData) {
   log.info('WS Received Message: ' + rawClientData);
   // safe parse FIXME?
   // parse to JSON
@@ -36,24 +36,35 @@ function route(conn, rawClientData) {
   }
 
   // try to match request with existing api's
-  let matched = false;
+  const reqDesc = getAppAndApiName(req);
   // 'for in' for performance
-  for (const item in api) {
-    if (api.hasOwnProperty(item)) {
-      const module = api[item];
-      if (req.method in module) {
-        matched = true;
-        api.auth.date();
-        module[req.method](req.params);
-      }
+  if (reqDesc.app in api) {
+    if (reqDesc.api in api[reqDesc.app]) {
+      api[reqDesc.app][reqDesc.api](req.params, {id: req.id, wsServer, conn});
+      return;
     }
   }
 
-  if (!matched) {
-    conn.sendUTF('{"jsonrpc": "2.0", "error": ' +
-      '{"code": -32601, "message": "Method not found"}, "id": "1"}');
-    log.error('Invalid method called ' + req.method);
+  // method not found, return client error
+  conn.sendUTF('{"jsonrpc": "2.0", "error": ' +
+    '{"code": -32601, "message": "Method not found"}, "id": "1"}');
+  log.error('Invalid method called ' + req.method);
+}
+
+/**
+ * Extract App and api from method string
+ * in request object
+ * @param {Object} Request object
+ * @return {Object} 'app' and 'api' strings
+ */
+function getAppAndApiName({method: m}) {
+  const parts = m.split('.');
+  if (parts.length != 2 || parts[1].length === 0) {
+    throw Error('Bad method name');
+    // fix me, what will happen when this error gets triggered
   }
+
+  return {app: parts[0], api: parts[1]};
 }
 
 module.exports = {route};

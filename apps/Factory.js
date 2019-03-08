@@ -1,8 +1,9 @@
-const {Authenticate} = require('./authenticate/login');
-
 // Authentication module
-const auth = new Authenticate();
-
+const Authenticate = require('./authenticate/login');
+const Chat = require('./chat/chat');
 
 // Export modules
-module.exports = {auth};
+module.exports = {
+  Authenticate,
+  Chat,
+};

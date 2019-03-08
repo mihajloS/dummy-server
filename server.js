@@ -10,6 +10,8 @@ const server = require('http').createServer();
 const WebSocketServer = require('websocket').server;
 const config = require('config').db;
 const dataRouter = require('./ws-router');
+const wsProtocol = "m-protocol";
+let cid = 0; // connection id
 
 // Database init
 mongoose.connect(config.dbUri, {useNewUrlParser: true});
@@ -75,17 +77,23 @@ wsServer.on('request', function(request) {
   }
 
   // craches on wrong protocol FIXME
-  const connection = request.accept('m-protocol', request.origin);
-  log.info((new Date()) + ' Connection accepted.');
+  const connection = request.accept(wsProtocol, request.origin);
+  // generate connection ID
+  connection.ID = ++cid;
+  log.info((new Date()) + ' Connection accepted. Connection ID = ' +
+    connection.ID);
+  log.info('Total connections count = ' + wsServer.connections.length);
 
   connection.on('message', function(message) {
+    console.log("connection.id", connection.id)
     log.info('>> >> msg ' + message);
     if (message.type === 'utf8') {
-      dataRouter.route(connection, message.utf8Data);
+      dataRouter.route(wsServer, connection, message.utf8Data);
     } else if (message.type === 'binary') {
       log.info('Received Binary Message of ' +
         message.binaryData.length + ' bytes');
       connection.sendBytes(message.binaryData);
+
     }
   });
 
@@ -96,7 +104,7 @@ wsServer.on('request', function(request) {
 });
 
 server.listen(PORT, () => {
-  log.info(`App listening on port ${PORT}`);
+  log.info(`App listening on port ${PORT}. Websocket protocol: ${wsProtocol}`);
 });
 
 module.exports = app; // for testing
