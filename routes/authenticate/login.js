@@ -11,7 +11,6 @@ const router = new Router();
 */
 router.route('/jwt').post(async (req, res) => {
   // FIXME creating false positive scenario
-  console.log(req);
   const fakeuser = {
     username: 'Mihajlo',
     password: 'password',
@@ -20,17 +19,17 @@ router.route('/jwt').post(async (req, res) => {
 
   try {
     const token = await jwt.signToken(fakeuser);
-    res.json(token);
+    res.json({token});
   } catch (err) {
+    log.info('err: ' + err);
     res.status(401);
     res.json('Authentication error');
   }
 });
 
 router.route('/jwt/test').post(async (req, res) => {
-  const token = req.get('token');
   try {
-    const data = await jwt.validateToken(token);
+    const data = await jwt.validateToken(req);
     res.json(data);
   } catch (err) {
     log.error('Token validate: ' + err);

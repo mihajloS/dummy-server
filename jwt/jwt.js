@@ -1,3 +1,4 @@
+const log = require('../logger').logger;
 const jwt = require('jsonwebtoken');
 const secretTokenKey = 'secretTokenWorkdThatOnlyBackendKnows';
 
@@ -21,11 +22,18 @@ function signToken(data) {
 }
 
 /**
- * Validate token and return data from it
- * @param {String} token
+ * Validate token extracted from request object
+ * @param {Object} req
  * @return {undefined}
  */
-function validateToken(token) {
+function validateToken(req) {
+  let token = req.get('Authorization');
+  log.info('validateToken token = ' + token);
+  if (!token) {
+    throw new Error('Token was not provided.');
+  }
+  // Extract token from string 'Bearer xxxyyyzzz'
+  token = token.split(' ')[1];
   return new Promise((resolve, reject) => {
     jwt.verify(token, secretTokenKey, (err, data) => {
       if (err) {
