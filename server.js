@@ -10,7 +10,7 @@ const server = require('http').createServer();
 const WebSocketServer = require('websocket').server;
 const config = require('config').db;
 const dataRouter = require('./ws-router');
-const wsProtocol = "m-protocol";
+const wsProtocol = 'm-protocol';
 let cid = 0; // connection id
 
 // Database init
@@ -85,7 +85,6 @@ wsServer.on('request', function(request) {
   log.info('Total connections count = ' + wsServer.connections.length);
 
   connection.on('message', function(message) {
-    console.log("connection.id", connection.id)
     log.info('>> >> msg ' + message);
     if (message.type === 'utf8') {
       dataRouter.route(wsServer, connection, message.utf8Data);
