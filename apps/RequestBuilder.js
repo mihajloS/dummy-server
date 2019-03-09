@@ -26,6 +26,16 @@ function buildError(errorCode, errorMessage, reqId) {
 }
 
 /**
+ * Build RPC error String
+ * @param {Any} data Response data
+ * @param {String} method Notification method name
+ * @return {String} Rpc notification
+ */
+function buildNotification(data, method) {
+  return `{"jsonrpc": "2.0", "method": ${method}, "params": ${data}}`;
+}
+
+/**
  * Buld rpc error for scenario
  * when RPC req was not passed.
  * This is usually developer error
@@ -36,4 +46,4 @@ function buildNoReqIdError() {
     '"message": "Server Req ID RPC error"}, "id": null}';
 }
 
-module.exports = {buildResult, buildError};
+module.exports = {buildResult, buildError, buildNotification};
