@@ -7,6 +7,7 @@ const api = require('./apps/Factory');
 // {"jsonrpc": "2.0", "method": "subtract",
 // "params": {"param1": "x", "param2": "y"}, "id": 3}
 const rpcRequestSchema = {
+  additionalProperties: false,
   properties: {
     'jsonrpc': {type: 'string'},
     'method': {'type': 'string', 'minLength': 2},
