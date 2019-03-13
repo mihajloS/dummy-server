@@ -85,7 +85,6 @@ wsServer.on('request', function(request) {
   log.info('Total connections count = ' + wsServer.connections.length);
 
   connection.on('message', function(message) {
-    log.info('>> >> msg ' + message);
     if (message.type === 'utf8') {
       dataRouter.route(wsServer, connection, message.utf8Data);
     } else if (message.type === 'binary') {
