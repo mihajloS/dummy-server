@@ -41,7 +41,7 @@ function join(data, {id, conn, wsServer}) {
 }
 
 // eslint-disable-next-line require-jsdoc
-function send({message, textID}, {id, conn, wsServer}) {
+function send({message}, {id, conn, wsServer}) {
   // FIXME: validate params
   // console.log('conn.nickname :', conn.nickname);
   if (!conn.nickname) {
@@ -55,7 +55,6 @@ function send({message, textID}, {id, conn, wsServer}) {
   wsServer.broadcast(rrBuilder.buildNotification(
       {
         message,
-        textID,
         userId: conn.ID,
       },
       'onMessage'));
