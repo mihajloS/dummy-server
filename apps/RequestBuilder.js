@@ -1,3 +1,22 @@
+let moduleName = '';
+
+/**
+ * Set module name
+ * @param {String} name Module name
+ */
+function setModuleName(name) {
+  moduleName = name;
+}
+
+/**
+ * Build full method name
+ * @param {String} name Function name
+ * @return {String} Full method name
+ */
+function buildMethodName(name) {
+  return `${moduleName}.${name}`;
+}
+
 /**
 * Build RPC result string
 * @param {Any} data Response data
@@ -8,7 +27,8 @@ function buildResult(data, reqId) {
   if (!reqId) {
     return buildNoReqIdError();
   }
-  return `{"jsonrpc": "2.0", "result": ${data}, "id": ${reqId}}`;
+  const ret = {jsonrpc: '2.0', method: 'result', params: data, id: reqId};
+  return JSON.stringify(ret);
 }
 
 /**
@@ -22,7 +42,9 @@ function buildError(errorCode, errorMessage, reqId) {
   if (!reqId) {
     return buildNoReqIdError();
   }
-  return `{"jsonrpc": "2.0", "error": {"code": ${errorCode}, "message": ${errorMessage}}, "id": ${reqId}}`;
+  const ret = {jsonrpc: '2.0', method: 'error', params: {code: errorCode,
+    message: errorMessage}, id: reqId};
+  return JSON.stringify(ret);
 }
 
 /**
@@ -32,7 +54,8 @@ function buildError(errorCode, errorMessage, reqId) {
  * @return {String} Rpc notification
  */
 function buildNotification(data, method) {
-  return `{"jsonrpc": "2.0", "method": ${method}, "params": ${data}}`;
+  const ret = {jsonrpc: '2.0', method: buildMethodName(method), params: data};
+  return JSON.stringify(ret);
 }
 
 /**
@@ -46,4 +69,4 @@ function buildNoReqIdError() {
     '"message": "Server Req ID RPC error"}, "id": null}';
 }
 
-module.exports = {buildResult, buildError, buildNotification};
+module.exports = {buildResult, buildError, buildNotification, setModuleName};

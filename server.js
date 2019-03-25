@@ -91,7 +91,6 @@ wsServer.on('request', function(request) {
       log.info('Received Binary Message of ' +
         message.binaryData.length + ' bytes');
       connection.sendBytes(message.binaryData);
-
     }
   });
 
