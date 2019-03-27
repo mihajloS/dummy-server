@@ -97,6 +97,8 @@ wsServer.on('request', function(request) {
   connection.on('close', function(reasonCode, description) {
     log.info((new Date()) + ' Peer ' +
       connection.remoteAddress + ' disconnected.');
+    // trigger chat leaveEvent that was build in chat.js
+    connection.leaveEvent();
   });
 });
 

@@ -47,13 +47,14 @@ describe('Chat', ()=> {
       }
       conn.on('message', (data) => {
         data = JSON.parse(data.utf8Data);
-        // {"jsonrpc":"2.0","method":"result","params":{"userId":1},"id":1}
+        // {"jsonrpc":"2.0","method":"result","params":{"userId":1, roster: {1: "Mika", 2: "Pera"}},"id":1}
         if (data.id === requestObject.id) {
           data.should.have.property('jsonrpc', '2.0');
           data.should.have.property('method', 'result');
           data.should.have.property('id', 1);
           data.should.have.property('params');
           data.params.should.have.property('userId');
+          data.params.should.have.property('roster');
         }
         // {"jsonrpc":"2.0","method":"Chat.onJoin","params":{"userId":1,"nickname":"Mika"}}
         if (data.method === 'Chat.onJoin') {
